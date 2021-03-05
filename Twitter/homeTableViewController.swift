@@ -23,8 +23,9 @@ class homeTableViewController: UITableViewController {
     }
     
     @objc func loadTweets() {
+        numberOfTweet = 20
         let tweetsUrl = "https://api.twitter.com/1.1/statuses/home_timeline.json"
-        let myParams = ["count": 20]
+        let myParams = ["count": numberOfTweet]
         TwitterAPICaller.client?.getDictionariesRequest(url: tweetsUrl, parameters: myParams, success: { (tweets: [NSDictionary]) in
             self.tweetArray.removeAll()  // clean up tweet array before adding new goodies
             for tweet in tweets {
@@ -37,6 +38,20 @@ class homeTableViewController: UITableViewController {
         })
     }
     
+    func loadMoreTweets() {
+        let tweetsUrl = "https://api.twitter.com/1.1/statuses/home_timeline.json"
+        numberOfTweet = numberOfTweet + 20
+        let myParams = ["count": numberOfTweet]
+        TwitterAPICaller.client?.getDictionariesRequest(url: tweetsUrl, parameters: myParams, success: { (tweets: [NSDictionary]) in
+            self.tweetArray.removeAll()  // clean up tweet array before adding new goodies
+            for tweet in tweets {
+                self.tweetArray.append(tweet)
+            }
+            self.tableView.reloadData()
+        }, failure: { (Error) in
+            print("Could not retrieve tweet!")
+        })
+    }
     
     @IBAction func onLogoutButton(_ sender: Any) {
         TwitterAPICaller.client?.logout()
@@ -44,6 +59,12 @@ class homeTableViewController: UITableViewController {
         UserDefaults.standard.set(false, forKey: "userLoggedIn")
     }
     
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        // when the user gets to the end of the table, run loadMoreTweets
+        if indexPath.row + 1 == self.tweetArray.count {
+            loadMoreTweets()
+        }
+    }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         // get data for cell content
@@ -83,7 +104,7 @@ class homeTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return tweetArray.count
+        return self.tweetArray.count
     }
 
 }
