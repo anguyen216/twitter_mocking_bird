@@ -22,6 +22,7 @@ class homeTableViewController: UITableViewController {
         tableView.refreshControl = myRefreshControl
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 150
+        tableView.allowsSelection = false
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -89,9 +90,10 @@ class homeTableViewController: UITableViewController {
             cell.profileImageView.image = UIImage(data: imageData)
         }
         
-        // post favorite
-        cell.setFavorite(tweetArray[indexPath.row]["favorited"] as! Bool)  // post flag
-        cell.tweetId = tweetArray[indexPath.row]["id"] as! Int  // pass tweetId to favorite/unfavorite action
+        cell.tweetId = tweetArray[indexPath.row]["id"] as! Int  // pass tweetId to tweetCell
+        cell.setFavorite(tweetArray[indexPath.row]["favorited"] as! Bool)  // post favorite flag
+        cell.setRetweet(tweetArray[indexPath.row]["retweeted"] as! Bool)  // post  retweet flag
+        
         
         // customize image view of profile pic to be a circle
         cell.profileImageView.layer.masksToBounds = true
